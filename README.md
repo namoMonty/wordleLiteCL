@@ -42,9 +42,6 @@ pip install colorama wordfreq
 
 2. **Ensure the `valid-wordle-words.txt` file is in the same directory as the script.**  
 3. **Run the game:**
-
-   python wordler.py
-
 ---
 
 ## **How to Play**
