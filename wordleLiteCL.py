@@ -11,37 +11,71 @@ from wordfreq import zipf_frequency
 NUMCHANCES = 6
 WORDLENGTH = 5
 INVALIDS = "0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+games = []
+gameDict = {
+    "Guesses": 0,
+    "Outcome": "",
+    "TheWord": "",
+}
 
+streak = 0
 def main():
-    
-    words = openWordsFile()
-    weightedWords = getWordsFreq()
-    THEWORD = weightedWordChoice(weightedWords)
 
+    print(Fore.CYAN + "*****************WELCOME TO WORDLE*****************")
+    playgameInput = input("Would You Like to play.....(" + Fore.GREEN + "Y" + Fore.WHITE + "/" + Fore.RED + "N" + Fore.WHITE + ")")
+    if (playgameInput.lower() == "n"):
+        
+        gameRunning = False
+        print("Ok, great, have a nice day I guess")
+    else:
 
-    # print(THEWORD) (if you want to be a cheater, cheater pumpkin eater)
+        gameRunning = True
+        # insturctions
+        
 
-    # insturctions
-    print(f"Welcome to Wordle! Guess the {WORDLENGTH}-letter word.")
-    print("Hints: Green = correct letter and position, Yellow = correct letter but wrong position, Red = incorrect letter.")
+    gamesplayed = 0
+    while (gameRunning):
+        words = openWordsFile()
+        weightedWords = getWordsFreq()
+        THEWORD = weightedWordChoice(weightedWords)
+        print(THEWORD) #(if you want to be a cheater, cheater pumpkin eater)
+        print(f"Welcome to Wordle! Guess the {WORDLENGTH}-letter word.")
+        print("Hints: Green = correct letter and position, Yellow = correct letter but wrong position, Red = incorrect letter.")
+        attempts = 1
+        guess = input(f"Enter your {WORDLENGTH}-letter guess: ").lower()
+        outcome = ""
 
-    attempts = 0
-    guess = input(f"Enter your {WORDLENGTH}-letter guess: ").lower()
+        gamesplayed += 1
+        # round-loop
+        while(attempts < NUMCHANCES):
+            if (guess == THEWORD):
+                print("YOU GOT IT!! " + Fore.GREEN + guess.upper() + Style.RESET_ALL + " IS THE WORD")
+                outcome = "WIN"
+                break
+            if isValid(guess,words):
+                attempts += 1
+                print("Guess " + str(attempts) + ":  " + compareWord(guess,THEWORD))
+                guess = input("ENTER WORD:  ")
+            else:
+                guess = input("INVALID INPUT! ENTER NEW WORD:  ")
 
-    # game loop
-    while(attempts < NUMCHANCES):
-        if (guess == THEWORD):
-            print("YOU GOT IT!! " + Fore.GREEN + guess.upper() + Style.RESET_ALL + " IS THE WORD")
+            if attempts >= NUMCHANCES:
+                print("GAME OVER! THE WORD WAS....  " + Fore.BLUE + THEWORD.upper())
+                outcome = "LOSS"
+        
+        game = {"game": "Game " + str(gamesplayed),"outcome":outcome,"theWord":THEWORD,"guesses":attempts}
+        games.append(game)
+        playgameInput = input("Would You Like to play Again? .....(" + Fore.GREEN + "Y" + Fore.WHITE + "/" + Fore.RED + "N" + Fore.WHITE + ")")
+        for game in games:
+            print(game)
+
+        if (playgameInput.lower() == "n"):
+            print("Ok, great, have a nice day I guess")
+            gameRunning = False
             break
-        if isValid(guess,words):
-            attempts += 1
-            print("Guess " + str(attempts) + ":  " + compareWord(guess,THEWORD))
-            guess = input("ENTER WORD:  ")
         else:
-            guess = input("INVALID INPUT! ENTER NEW WORD:  ")
-
-        if attempts >= NUMCHANCES:
-            print("GAME OVER! THE WORD WAS....  " + Fore.BLUE + THEWORD.upper)
+            gameRunning = True
+        
 # returns the frequency of words as a sorted list
 def getWordsFreq():
     words = openWordsFile()
